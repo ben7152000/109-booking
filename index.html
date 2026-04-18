@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Form</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+  <style>
+    *,
+    *::before,
+    *::after { box-sizing: border-box; }
+
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, "Noto Sans TC", "Noto Sans JP", "Noto Sans KR",
+        sans-serif;
+      background: #fff0d9;
+      color: #202124;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .lang-bar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff0d9;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+    .lang-bar__inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .lang-btn {
+      flex: 1 1 auto;
+      min-width: 72px;
+      padding: 8px 12px;
+      font-size: 14px;
+      background: #fff;
+      color: #5f6368;
+      border: 1px solid #dadce0;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .lang-btn:hover { background: #f8f0e1; }
+    .lang-btn.is-active {
+      background: #c57b1e;
+      color: #fff;
+      border-color: #c57b1e;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .block {
+      background: #fff;
+      border: 1px solid #e0c9a4;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .form__header {
+      border-top: 10px solid #c57b1e;
+      padding-top: 24px;
+    }
+    .form__title {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.3;
+    }
+    .form__desc {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: #5f6368;
+    }
+    .form__required-note {
+      margin: 0;
+      font-size: 13px;
+      color: #5f6368;
+    }
+
+    .block__label {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: #202124;
+    }
+    .block__hint {
+      margin: -4px 0 10px;
+      font-size: 13px;
+      color: #5f6368;
+    }
+    .block__notice {
+      margin: -4px 0 6px;
+      font-size: 13px;
+      color: #d93025;
+      font-weight: 500;
+    }
+    .required {
+      color: #d93025;
+      margin-left: 4px;
+    }
+
+    .block__input {
+      display: block;
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      color: #202124;
+      background: #fff;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      font-family: inherit;
+    }
+    .block__input:focus {
+      border-color: #c57b1e;
+      box-shadow: 0 0 0 3px rgba(197, 123, 30, 0.2);
+    }
+    .block__input.is-invalid {
+      border-color: #d93025;
+    }
+    .block__input.is-invalid:focus {
+      box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.2);
+    }
+    .field-error {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: #d93025;
+      display: none;
+    }
+    .field-error.is-visible { display: block; }
+    select.block__input {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='%235f6368' d='M6 8 0 0h12z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+    .file-upload {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .file-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .file-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 18px;
+      background: #fff;
+      color: #c57b1e;
+      border: 1px solid #c57b1e;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .file-btn:hover { background: #fff7ea; }
+    .file-btn:focus-within { box-shadow: 0 0 0 3px rgba(197,123,30,.2); }
+    .file-name {
+      font-size: 14px;
+      color: #5f6368;
+      word-break: break-all;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .file-name.is-busy { color: #c57b1e; font-weight: 500; }
+
+    .block__options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid #eadfcc;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: background .15s, border-color .15s;
+    }
+    .option:hover { background: #fff7ea; }
+    .option input[type="radio"] {
+      accent-color: #c57b1e;
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .option:has(input:checked) {
+      background: #fff1dc;
+      border-color: #c57b1e;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      padding-bottom: 32px;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: #c57b1e;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s, transform .05s;
+    }
+    .submit-btn:hover { background: #a6661a; }
+    .submit-btn:active { transform: translateY(1px); }
+    .submit-btn:disabled {
+      background: #c9b79a;
+      cursor: not-allowed;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(32, 33, 36, 0.55);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.is-active { display: flex; }
+    .spinner {
+      width: 52px;
+      height: 52px;
+      border: 4px solid rgba(255, 255, 255, 0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (min-width: 640px) {
+      .page { padding: 24px; }
+      .block { padding: 24px; }
+      .form__title { font-size: 28px; }
+      .block__options { gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="lang-bar">
+    <div class="lang-bar__inner">
+      <button type="button" class="lang-btn" data-lang="en" data-i18n="langEn"></button>
+      <button type="button" class="lang-btn" data-lang="zh" data-i18n="langZh"></button>
+      <button type="button" class="lang-btn" data-lang="ja" data-i18n="langJa"></button>
+      <button type="button" class="lang-btn" data-lang="ko" data-i18n="langKo"></button>
+    </div>
+  </header>
+
+  <main class="page">
+    <form id="booking-form" class="form" novalidate>
+      <section class="form__header block">
+        <h1 class="form__title" data-i18n="formTitle"></h1>
+        <p class="form__desc" data-i18n="formDesc"></p>
+        <p class="form__required-note">
+          <span class="required">*</span>
+          <span data-i18n="requiredNote"></span>
+        </p>
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="email">
+          <span data-i18n="email"></span><span class="required">*</span>
+        </label>
+        <input type="email" id="email" name="email" class="block__input" data-i18n-ph="emailPh" autocomplete="email" required />
+        <p class="field-error" id="emailError" data-i18n="emailInvalid"></p>
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="checkInDate">
+          <span data-i18n="checkInDate"></span><span class="required">*</span>
+        </label>
+        <input type="text" id="checkInDate" name="checkInDate" class="block__input" autocomplete="off" readonly required />
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="bookingName">
+          <span data-i18n="bookingName"></span><span class="required">*</span>
+        </label>
+        <input type="text" id="bookingName" name="bookingName" class="block__input" data-i18n-ph="bookingNamePh" required />
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="phone">
+          <span data-i18n="phone"></span><span class="required" data-required-for="phone">*</span>
+        </label>
+        <input type="tel" inputmode="numeric" pattern="[0-9+\-\s]*" id="phone" name="phone" class="block__input" data-i18n-ph="phonePh" required />
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="lineId">
+          <span data-i18n="lineId"></span><span class="required">*</span>
+        </label>
+        <input type="text" id="lineId" name="lineId" class="block__input" data-i18n-ph="lineIdPh" required />
+      </section>
+
+      <section class="block">
+        <div class="block__label">
+          <span data-i18n="gender"></span>
+        </div>
+        <div class="block__options">
+          <label class="option">
+            <input type="radio" name="gender" value="male" />
+            <span data-i18n="male"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="gender" value="female" />
+            <span data-i18n="female"></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block__label">
+          <span data-i18n="source"></span>
+        </div>
+        <div class="block__options">
+          <label class="option">
+            <input type="radio" name="source" value="airbnb" />
+            <span data-i18n="srcAirbnb"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="agoda" />
+            <span data-i18n="srcAgoda"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="asiayo" />
+            <span data-i18n="srcAsiaYo"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="booking" />
+            <span data-i18n="srcBooking"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="ctrip" />
+            <span data-i18n="srcCtrip"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="direct" />
+            <span data-i18n="srcDirect"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="expedia" />
+            <span data-i18n="srcExpedia"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="facebook" />
+            <span data-i18n="srcFacebook"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="line" />
+            <span data-i18n="srcLine"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="wechat" />
+            <span data-i18n="srcWechat"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="eztravel" />
+            <span data-i18n="srcEztravel"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="hostelworld" />
+            <span data-i18n="srcHostelworld"></span>
+          </label>
+          <label class="option">
+            <input type="radio" name="source" value="other" />
+            <span data-i18n="srcOther"></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="idFile">
+          <span data-i18n="idFile"></span><span class="required">*</span>
+        </label>
+        <p class="block__notice" data-i18n="idFileNotice"></p>
+        <p class="block__hint" data-i18n="idFileHint"></p>
+        <div class="file-upload">
+          <label for="idFile" class="file-btn">
+            <span data-i18n="chooseFile"></span>
+          </label>
+          <span class="file-name" id="idFileName" data-i18n="noFileChosen"></span>
+          <input type="file" id="idFile" name="idFile" class="file-input" accept="image/*,.pdf" required />
+        </div>
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="nationality">
+          <span data-i18n="nationality"></span>
+        </label>
+        <select id="nationality" name="nationality" class="block__input">
+          <option value="" data-i18n="selectPlaceholder"></option>
+          <option value="TWN" data-i18n="natTWN"></option>
+          <option value="CHN" data-i18n="natCHN"></option>
+          <option value="SGP" data-i18n="natSGP"></option>
+          <option value="MYS" data-i18n="natMYS"></option>
+          <option value="JPN" data-i18n="natJPN"></option>
+          <option value="FRA" data-i18n="natFRA"></option>
+          <option value="HKG" data-i18n="natHKG"></option>
+          <option value="KOR" data-i18n="natKOR"></option>
+          <option value="THA" data-i18n="natTHA"></option>
+          <option value="USA" data-i18n="natUSA"></option>
+          <option value="PHL" data-i18n="natPHL"></option>
+          <option value="IDN" data-i18n="natIDN"></option>
+          <option value="NLD" data-i18n="natNLD"></option>
+          <option value="GBR" data-i18n="natGBR"></option>
+          <option value="ESP" data-i18n="natESP"></option>
+          <option value="MAC" data-i18n="natMAC"></option>
+          <option value="ZAF" data-i18n="natZAF"></option>
+          <option value="DEU" data-i18n="natDEU"></option>
+          <option value="CAN" data-i18n="natCAN"></option>
+          <option value="VNM" data-i18n="natVNM"></option>
+          <option value="KHM" data-i18n="natKHM"></option>
+          <option value="ITA" data-i18n="natITA"></option>
+          <option value="PAN" data-i18n="natPAN"></option>
+          <option value="IND" data-i18n="natIND"></option>
+          <option value="POL" data-i18n="natPOL"></option>
+          <option value="SWE" data-i18n="natSWE"></option>
+          <option value="CZE" data-i18n="natCZE"></option>
+          <option value="OTHER" data-i18n="nationalityOther"></option>
+        </select>
+      </section>
+
+      <div class="actions">
+        <button type="submit" class="submit-btn" data-i18n="submit"></button>
+      </div>
+    </form>
+  </main>
+
+  <div class="overlay" id="submitOverlay" aria-hidden="true">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+  (function () {
+    // ============================================================
+    //  設定區：部署 Apps Script 後把 URL 貼進來
+    // ============================================================
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycby67VMQz38wy3nDnzMDquP-CvJaBnocM7w7VsU-HatkNIqf6XUBGQ-T8mKpP3K1cfJAzw/exec";
+
+    const SUPPORTED_LANGS = ["en", "zh", "ja", "ko"];
+    const DEFAULT_LANG = "en";
+
+    // i18n dictionary — key-first. Add / edit a key in one place.
+    // Each entry: { en, zh, ja, ko }.
+    const I18N = {
+      // Language switcher
+      langEn: { en: "English", zh: "英文", ja: "英語", ko: "영어" },
+      langZh: { en: "Chinese", zh: "中文", ja: "中国語", ko: "중국어" },
+      langJa: { en: "Japanese", zh: "日文", ja: "日本語", ko: "일본어" },
+      langKo: { en: "Korean", zh: "韓文", ja: "韓国語", ko: "한국어" },
+
+      // Form header
+      formTitle: { en: "Booking Form", zh: "訂房表單", ja: "予約フォーム", ko: "예약 양식" },
+      formDesc: {
+        en: "Please fill in your booking details below.",
+        zh: "請填寫以下訂房資訊。",
+        ja: "以下のご予約情報をご記入ください。",
+        ko: "아래 예약 정보를 입력해 주세요.",
+      },
+      requiredNote: {
+        en: "Indicates required question",
+        zh: "表示必填問題",
+        ja: "必須項目です",
+        ko: "필수 항목입니다",
+      },
+
+      // Email
+      email: { en: "Email", zh: "電子郵件", ja: "メールアドレス", ko: "이메일" },
+      emailPh: { en: "example@gmail.com", zh: "example@gmail.com", ja: "example@gmail.com", ko: "example@gmail.com" },
+      emailInvalid: {
+        en: "Please enter a valid email address.",
+        zh: "請輸入有效的電子郵件地址。",
+        ja: "有効なメールアドレスを入力してください。",
+        ko: "유효한 이메일 주소를 입력해 주세요.",
+      },
+
+      // Check-in date
+      checkInDate: { en: "Check-in Date", zh: "入住日期", ja: "チェックイン日", ko: "체크인 날짜" },
+      datePlaceholder: { en: "YYYY-MM-DD", zh: "YYYY-MM-DD", ja: "YYYY-MM-DD", ko: "YYYY-MM-DD" },
+
+      // Booking name
+      bookingName: { en: "Booking Name", zh: "訂房人姓名", ja: "予約者氏名", ko: "예약자 성함" },
+      bookingNamePh: { en: "e.g. John Smith", zh: "例如：王小明", ja: "例：山田 太郎", ko: "예: 홍길동" },
+
+      // Phone
+      phone: { en: "Phone Number", zh: "聯繫電話", ja: "電話番号", ko: "연락처" },
+      phonePh: { en: "e.g. +886 912 345 678", zh: "例如：+886 912 345 678", ja: "例：+886 912 345 678", ko: "예: +886 912 345 678" },
+
+      // LINE ID
+      lineId: { en: "WhatsApp ID", zh: "LINE ID", ja: "LINE ID", ko: "Kakao ID" },
+      lineIdPh: {
+        en: "e.g. +1 555 123 4567",
+        zh: "例如：hotel109_tw",
+        ja: "例：hotel109_jp",
+        ko: "예: hotel109_kr",
+      },
+
+      // Gender
+      gender: { en: "Gender", zh: "性別", ja: "性別", ko: "성별" },
+      male: { en: "Male", zh: "男", ja: "男性", ko: "남성" },
+      female: { en: "Female", zh: "女", ja: "女性", ko: "여성" },
+
+      // Source
+      source: { en: "Source", zh: "來源", ja: "予約元", ko: "예약 경로" },
+      srcAirbnb: { en: "Airbnb", zh: "Airbnb", ja: "Airbnb", ko: "Airbnb" },
+      srcAgoda: { en: "Agoda", zh: "Agoda", ja: "Agoda", ko: "Agoda" },
+      srcAsiaYo: { en: "AsiaYo", zh: "AsiaYo", ja: "AsiaYo", ko: "AsiaYo" },
+      srcBooking: { en: "Booking", zh: "Booking", ja: "Booking", ko: "Booking" },
+      srcCtrip: { en: "Ctrip / trip.com", zh: "Ctrip / trip.com", ja: "Ctrip / trip.com", ko: "Ctrip / trip.com" },
+      srcDirect: { en: "Direct Account", zh: "直客", ja: "直接予約", ko: "직접 예약" },
+      srcExpedia: { en: "Expedia", zh: "Expedia", ja: "Expedia", ko: "Expedia" },
+      srcFacebook: { en: "Facebook", zh: "Facebook", ja: "Facebook", ko: "Facebook" },
+      srcLine: { en: "LINE", zh: "LINE", ja: "LINE", ko: "LINE" },
+      srcWechat: { en: "WeChat", zh: "WeChat", ja: "WeChat", ko: "WeChat" },
+      srcEztravel: { en: "Eztravel", zh: "易遊網", ja: "Eztravel", ko: "Eztravel" },
+      srcHostelworld: { en: "Hostelworld", zh: "Hostelworld", ja: "Hostelworld", ko: "Hostelworld" },
+      srcOther: { en: "Other", zh: "其他", ja: "その他", ko: "기타" },
+
+      // ID file upload
+      idFile: {
+        en: "Passport / ID Number (upload)",
+        zh: "護照 / 身分證字號（上傳）",
+        ja: "パスポート / 身分証番号（アップロード）",
+        ko: "여권 / 신분증 번호 (업로드)",
+      },
+      idFileNotice: {
+        en: "*For 109 Hotel accommodation use only.",
+        zh: "*僅供 109 旅店住宿使用",
+        ja: "*109 ホテル宿泊のみに使用します。",
+        ko: "*109 호텔 숙박 용도로만 사용됩니다.",
+      },
+      idFileHint: {
+        en: "You can upload 1 file (JPG, PNG, HEIC, PDF). Max size: 10MB.",
+        zh: "可上傳 1 個檔案（JPG、PNG、HEIC、PDF），大小上限為 10MB。",
+        ja: "ファイルを 1 つアップロード可能（JPG / PNG / HEIC / PDF）、最大 10MB。",
+        ko: "파일 1개 업로드 가능 (JPG / PNG / HEIC / PDF), 최대 10MB.",
+      },
+      idFileTooLarge: {
+        en: "File exceeds the 10MB size limit.",
+        zh: "檔案超過 10MB 大小限制。",
+        ja: "ファイルサイズが 10MB の上限を超えています。",
+        ko: "파일 크기가 10MB 제한을 초과합니다.",
+      },
+      chooseFile: { en: "Choose File", zh: "選擇檔案", ja: "ファイルを選択", ko: "파일 선택" },
+      noFileChosen: { en: "No file chosen", zh: "尚未選擇檔案", ja: "ファイルが選択されていません", ko: "선택된 파일 없음" },
+      compressing: { en: "Compressing image...", zh: "壓縮圖片中...", ja: "画像を圧縮中...", ko: "이미지 압축 중..." },
+      pdfTooLarge: {
+        en: "PDF file is too large. Please upload a file under 10MB.",
+        zh: "PDF 檔案過大，請上傳 10MB 以下的檔案。",
+        ja: "PDF ファイルが大きすぎます。10MB 以下のファイルをアップロードしてください。",
+        ko: "PDF 파일이 너무 큽니다. 10MB 이하의 파일을 업로드해 주세요.",
+      },
+
+      // Nationality
+      nationality: { en: "Nationality", zh: "國籍", ja: "国籍", ko: "국적" },
+      selectPlaceholder: { en: "-- Please select --", zh: "-- 請選擇 --", ja: "-- 選択してください --", ko: "-- 선택해 주세요 --" },
+      natTWN: { en: "Taiwan", zh: "台灣", ja: "台湾", ko: "대만" },
+      natCHN: { en: "China", zh: "中國大陸", ja: "中国", ko: "중국" },
+      natSGP: { en: "Singapore", zh: "新加坡", ja: "シンガポール", ko: "싱가포르" },
+      natMYS: { en: "Malaysia", zh: "馬來西亞", ja: "マレーシア", ko: "말레이시아" },
+      natJPN: { en: "Japan", zh: "日本", ja: "日本", ko: "일본" },
+      natFRA: { en: "France", zh: "法國", ja: "フランス", ko: "프랑스" },
+      natHKG: { en: "Hong Kong", zh: "香港", ja: "香港", ko: "홍콩" },
+      natKOR: { en: "Korea", zh: "韓國", ja: "韓国", ko: "대한민국" },
+      natTHA: { en: "Thailand", zh: "泰國", ja: "タイ", ko: "태국" },
+      natUSA: { en: "United States", zh: "美國", ja: "アメリカ合衆国", ko: "미국" },
+      natPHL: { en: "Philippines", zh: "菲律賓", ja: "フィリピン", ko: "필리핀" },
+      natIDN: { en: "Indonesia", zh: "印尼", ja: "インドネシア", ko: "인도네시아" },
+      natNLD: { en: "Netherlands", zh: "荷蘭", ja: "オランダ", ko: "네덜란드" },
+      natGBR: { en: "United Kingdom", zh: "英國", ja: "イギリス", ko: "영국" },
+      natESP: { en: "Spain", zh: "西班牙", ja: "スペイン", ko: "스페인" },
+      natMAC: { en: "Macau", zh: "澳門", ja: "マカオ", ko: "마카오" },
+      natZAF: { en: "South Africa", zh: "南非", ja: "南アフリカ", ko: "남아프리카 공화국" },
+      natDEU: { en: "Germany", zh: "德國", ja: "ドイツ", ko: "독일" },
+      natCAN: { en: "Canada", zh: "加拿大", ja: "カナダ", ko: "캐나다" },
+      natVNM: { en: "Vietnam", zh: "越南", ja: "ベトナム", ko: "베트남" },
+      natKHM: { en: "Cambodia", zh: "柬埔寨", ja: "カンボジア", ko: "캄보디아" },
+      natITA: { en: "Italy", zh: "義大利", ja: "イタリア", ko: "이탈리아" },
+      natPAN: { en: "Panama", zh: "巴拿馬", ja: "パナマ", ko: "파나마" },
+      natIND: { en: "India", zh: "印度", ja: "インド", ko: "인도" },
+      natPOL: { en: "Poland", zh: "波蘭", ja: "ポーランド", ko: "폴란드" },
+      natSWE: { en: "Sweden", zh: "瑞典", ja: "スウェーデン", ko: "스웨덴" },
+      natCZE: { en: "Czech Republic", zh: "捷克", ja: "チェコ", ko: "체코" },
+      nationalityOther: {
+        en: "Other (please inform front desk)",
+        zh: "其他（請告訴櫃檯）",
+        ja: "その他（フロントまでお知らせください）",
+        ko: "기타 (프런트에 알려 주세요)",
+      },
+
+      // Actions / alerts
+      submit: { en: "Submit", zh: "送出", ja: "送信", ko: "제출" },
+      submitOk: {
+        en: "Submitted successfully. Thank you!",
+        zh: "送出成功，感謝您！",
+        ja: "送信が完了しました。ありがとうございます！",
+        ko: "제출되었습니다. 감사합니다!",
+      },
+      submitFail: {
+        en: "Submission failed, please try again.",
+        zh: "送出失敗，請再試一次。",
+        ja: "送信に失敗しました。もう一度お試しください。",
+        ko: "제출에 실패했습니다. 다시 시도해 주세요.",
+      },
+      validateRequired: {
+        en: "Please complete all required fields.",
+        zh: "請完成所有必填欄位。",
+        ja: "必須項目をすべて入力してください。",
+        ko: "모든 필수 항목을 입력해 주세요.",
+      },
+    };
+
+    function t(key, lang) {
+      const e = I18N[key];
+      if (!e) return "";
+      return e[lang] ?? e[DEFAULT_LANG] ?? "";
+    }
+    function dictFor(lang) {
+      const out = {};
+      for (const k in I18N) out[k] = t(k, lang);
+      return out;
+    }
+
+    const STORAGE_KEY = "bookingFormDraft";
+    const LANG_KEY = "bookingFormLang";
+    const I18N_CACHE_KEY = "bookingFormI18N";
+
+    const form = document.getElementById("booking-form");
+    const langBtns = document.querySelectorAll(".lang-btn");
+
+    function currentLang() {
+      const saved = localStorage.getItem(LANG_KEY);
+      return SUPPORTED_LANGS.includes(saved) ? saved : DEFAULT_LANG;
+    }
+
+    const FP_LOCALES = { en: null, zh: "zh_tw", ja: "ja", ko: "ko" };
+    let fpInstance = null;
+
+    // Per-language field rules (required / visibility)
+    const FIELD_RULES = {
+      phone: { required: { en: false, zh: true, ja: false, ko: false } },
+    };
+
+    function applyFieldRules(lang) {
+      for (const name in FIELD_RULES) {
+        const rule = FIELD_RULES[name];
+        const input = form.elements[name];
+        if (input && rule.required) {
+          const req = !!rule.required[lang];
+          input.required = req;
+          const mark = document.querySelector('[data-required-for="' + name + '"]');
+          if (mark) mark.style.display = req ? "" : "none";
+        }
+      }
+    }
+
+    function setupDatePicker(lang) {
+      const dateInput = document.getElementById("checkInDate");
+      if (!window.flatpickr || !dateInput) return;
+      const prev = fpInstance ? fpInstance.input.value : dateInput.value;
+      if (fpInstance) { fpInstance.destroy(); fpInstance = null; }
+      const dict = dictFor(lang);
+      const localeKey = FP_LOCALES[lang];
+      const opts = {
+        dateFormat: "Y-m-d",
+        allowInput: false,
+        disableMobile: true,
+      };
+      if (localeKey && flatpickr.l10ns && flatpickr.l10ns[localeKey]) {
+        opts.locale = flatpickr.l10ns[localeKey];
+      }
+      fpInstance = flatpickr(dateInput, opts);
+      dateInput.setAttribute("placeholder", dict.datePlaceholder || "YYYY-MM-DD");
+      if (prev) fpInstance.setDate(prev, false);
+    }
+
+    function applyLang(lang) {
+      const dict = dictFor(lang);
+      const htmlLang = lang === "zh" ? "zh-TW" : lang;
+      document.documentElement.lang = htmlLang;
+
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key] !== undefined) el.textContent = dict[key];
+      });
+      document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
+        const key = el.getAttribute("data-i18n-ph");
+        if (dict[key] !== undefined) el.setAttribute("placeholder", dict[key]);
+      });
+
+      setupDatePicker(lang);
+      applyFieldRules(lang);
+
+      langBtns.forEach((btn) => {
+        btn.classList.toggle("is-active", btn.dataset.lang === lang);
+      });
+      document.title = dict.formTitle;
+    }
+
+    langBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const lang = btn.dataset.lang;
+        if (!SUPPORTED_LANGS.includes(lang)) return;
+        localStorage.setItem(LANG_KEY, lang);
+        applyLang(lang);
+      });
+    });
+
+    function readDraft() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveDraft(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+    function clearDraft() {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    function collectFormData() {
+      const data = {};
+      Array.from(form.elements).forEach((el) => {
+        if (!el.name) return;
+        if (el.type === "file") return;
+        if (el.type === "radio") {
+          if (el.checked) data[el.name] = el.value;
+        } else if (el.type === "checkbox") {
+          data[el.name] = el.checked;
+        } else {
+          data[el.name] = el.value;
+        }
+      });
+      return data;
+    }
+
+    function restoreDraft() {
+      const draft = readDraft();
+      Object.keys(draft).forEach((name) => {
+        const value = draft[name];
+        const fields = form.elements[name];
+        if (!fields) return;
+        if (fields instanceof RadioNodeList) {
+          fields.forEach((el) => {
+            if (el.type === "radio") el.checked = el.value === value;
+          });
+        } else if (fields.type === "file") {
+          // file inputs can't be restored for security
+        } else {
+          fields.value = value;
+        }
+      });
+    }
+
+    form.addEventListener("input", () => saveDraft(collectFormData()));
+    form.addEventListener("change", () => saveDraft(collectFormData()));
+
+    const emailInput = document.getElementById("email");
+    const emailError = document.getElementById("emailError");
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    function validateEmail() {
+      const v = emailInput.value.trim();
+      const invalid = v !== "" && !EMAIL_RE.test(v);
+      emailInput.classList.toggle("is-invalid", invalid);
+      emailError.classList.toggle("is-visible", invalid);
+    }
+    emailInput.addEventListener("input", validateEmail);
+    emailInput.addEventListener("blur", validateEmail);
+
+    const idFileInput = document.getElementById("idFile");
+    const idFileName = document.getElementById("idFileName");
+    let compressedFile = null;
+
+    function updateFileName() {
+      const dict = dictFor(currentLang());
+      idFileName.classList.remove("is-busy");
+      const f = compressedFile || (idFileInput.files && idFileInput.files[0]);
+      if (f) {
+        idFileName.removeAttribute("data-i18n");
+        idFileName.textContent = f.name + " (" + (f.size / 1024 / 1024).toFixed(2) + "MB)";
+      } else {
+        idFileName.setAttribute("data-i18n", "noFileChosen");
+        idFileName.textContent = dict.noFileChosen;
+      }
+    }
+
+    idFileInput.addEventListener("change", async () => {
+      compressedFile = null;
+      updateFileName();
+      const raw = idFileInput.files && idFileInput.files[0];
+      if (!raw) return;
+      if (raw.type.startsWith("image/") && raw.size > COMPRESS_TARGET) {
+        const dict = dictFor(currentLang());
+        idFileName.classList.add("is-busy");
+        idFileName.textContent = dict.compressing;
+        try {
+          compressedFile = await compressImage(raw);
+        } catch (err) {
+          console.error(err);
+        }
+        updateFileName();
+      }
+    });
+
+    const MAX_BYTES = 10 * 1024 * 1024;
+    const COMPRESS_TARGET = 400 * 1024;
+
+    async function decodeImage(file) {
+      try {
+        return await createImageBitmap(file);
+      } catch (e) {
+        const url = URL.createObjectURL(file);
+        try {
+          return await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = (err) => reject(err);
+            img.src = url;
+          });
+        } finally {
+          setTimeout(() => URL.revokeObjectURL(url), 0);
+        }
+      }
+    }
+
+    async function compressImage(file) {
+      let bitmap;
+      try {
+        bitmap = await decodeImage(file);
+      } catch (e) {
+        console.warn("Cannot decode image, skipping compression:", e);
+        return file;
+      }
+      const MAX_DIM = 1800;
+      let baseW = bitmap.naturalWidth || bitmap.width;
+      let baseH = bitmap.naturalHeight || bitmap.height;
+      const maxSide = Math.max(baseW, baseH);
+      if (maxSide > MAX_DIM) {
+        const r = MAX_DIM / maxSide;
+        baseW = Math.round(baseW * r);
+        baseH = Math.round(baseH * r);
+      }
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      const scales = [1, 0.85, 0.7, 0.55, 0.45, 0.35, 0.28];
+      const qualities = [0.85, 0.75, 0.65, 0.55, 0.45];
+      let last = null;
+      for (const scale of scales) {
+        canvas.width = Math.max(1, Math.round(baseW * scale));
+        canvas.height = Math.max(1, Math.round(baseH * scale));
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        for (const quality of qualities) {
+          const blob = await new Promise((res) =>
+            canvas.toBlob(res, "image/jpeg", quality)
+          );
+          if (!blob) continue;
+          last = blob;
+          if (blob.size <= COMPRESS_TARGET) {
+            const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+            return new File([blob], name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+          }
+        }
+      }
+      const name = file.name.replace(/\.[^.]+$/, "") + ".jpg";
+      return new File([last || file], name, {
+        type: "image/jpeg",
+        lastModified: Date.now(),
+      });
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function sendToBackend(payload, file) {
+      if (!ENDPOINT) {
+        console.warn("ENDPOINT 未設定，以下是送出資料：", payload, file);
+        await new Promise((r) => setTimeout(r, 300));
+        return true;
+      }
+      const body = {
+        ...payload,
+        lang: currentLang(),
+        submittedAt: new Date().toISOString(),
+      };
+      if (file) {
+        body.fileBase64 = await fileToBase64(file);
+        body.fileName = file.name;
+        body.fileMimeType = file.type;
+      }
+      const res = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) return false;
+      try {
+        const json = await res.json();
+        return json.ok === true;
+      } catch {
+        return true;
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const dict = dictFor(currentLang());
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        alert(dict.validateRequired);
+        return;
+      }
+
+      const btn = form.querySelector(".submit-btn");
+      const overlay = document.getElementById("submitOverlay");
+      btn.disabled = true;
+      overlay.classList.add("is-active");
+
+      const data = collectFormData();
+      const lang = currentLang();
+      if (data.gender) data.gender = t(data.gender, lang) || data.gender;
+      if (data.nationality) {
+        const key = data.nationality === "OTHER" ? "nationalityOther" : "nat" + data.nationality;
+        data.nationality = t(key, lang) || data.nationality;
+      }
+      const rawFile = idFileInput.files && idFileInput.files[0];
+      let file = compressedFile || rawFile;
+
+      try {
+        if (file && file.size > MAX_BYTES) {
+          alert(file.type.startsWith("image/") ? dict.idFileTooLarge : dict.pdfTooLarge);
+          return;
+        }
+
+        const ok = await sendToBackend(data, file);
+        if (!ok) throw new Error("send failed");
+        clearDraft();
+        form.reset();
+        compressedFile = null;
+        updateFileName();
+        alert(dict.submitOk);
+      } catch (err) {
+        console.error(err);
+        alert(dict.submitFail);
+      } finally {
+        btn.disabled = false;
+        overlay.classList.remove("is-active");
+      }
+    });
+
+    function mergeI18N(data) {
+      for (const k in data) {
+        const entry = data[k];
+        if (I18N[k]) Object.assign(I18N[k], entry);
+        else I18N[k] = entry;
+      }
+    }
+
+    function loadCachedI18N() {
+      try {
+        const raw = localStorage.getItem(I18N_CACHE_KEY);
+        if (!raw) return;
+        mergeI18N(JSON.parse(raw));
+      } catch {}
+    }
+
+    async function loadRemoteI18N() {
+      if (!ENDPOINT) return;
+      try {
+        const res = await fetch(ENDPOINT);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (!json.ok || !json.data) return;
+        mergeI18N(json.data);
+        localStorage.setItem(I18N_CACHE_KEY, JSON.stringify(json.data));
+        applyLang(currentLang());
+      } catch (e) {
+        console.warn("Failed to load remote i18n:", e);
+      }
+    }
+
+    loadCachedI18N();
+    applyLang(currentLang());
+    restoreDraft();
+    loadRemoteI18N();
+  })();
+  </script>
+</body>
+</html>
