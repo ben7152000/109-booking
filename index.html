@@ -234,6 +234,80 @@
       border-color: #c57b1e;
     }
 
+    .terms-box {
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 14px 16px;
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      background: #fafafa;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #3c4043;
+      -webkit-overflow-scrolling: touch;
+    }
+    .terms-box h4 {
+      margin: 14px 0 4px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #202124;
+    }
+    .terms-box h4:first-child { margin-top: 0; }
+    .terms-box p { margin: 0 0 6px; }
+
+    .agree-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .agree-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #c57b1e;
+      flex-shrink: 0;
+      cursor: pointer;
+      margin: 0;
+    }
+    .agree-row span {
+      font-size: 15px;
+      font-weight: 500;
+      color: #202124;
+    }
+    .agree-row .required { color: #d93025; margin-left: 2px; }
+
+    .signature-wrap {
+      border: 2px dashed #bdbdbd;
+      border-radius: 8px;
+      background: #f5f5f5;
+      position: relative;
+      height: 220px;
+      touch-action: none;
+      overflow: hidden;
+    }
+    .signature-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+      touch-action: none;
+    }
+    .signature-clear {
+      margin-top: 8px;
+      padding: 0;
+      background: none;
+      border: none;
+      color: #d93025;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      font-family: inherit;
+      font-size: 15px;
+    }
+    .signature-clear:hover { opacity: 0.85; }
+
     .actions {
       display: flex;
       justify-content: flex-end;
@@ -474,6 +548,27 @@
         </select>
       </section>
 
+      <section class="block">
+        <div class="block__label">
+          <span data-i18n="termsTitle"></span>
+        </div>
+        <div class="terms-box" id="termsBox"></div>
+        <label class="agree-row">
+          <input type="checkbox" id="agreeTerms" name="agreeTerms" required />
+          <span><span data-i18n="agreeTerms"></span><span class="required">*</span></span>
+        </label>
+      </section>
+
+      <section class="block">
+        <label class="block__label" for="signatureCanvas">
+          <span data-i18n="signatureLabel"></span><span class="required">*</span>
+        </label>
+        <div class="signature-wrap">
+          <canvas class="signature-canvas" id="signatureCanvas"></canvas>
+        </div>
+        <button type="button" class="signature-clear" id="signatureClear" data-i18n="signatureClear"></button>
+      </section>
+
       <div class="actions">
         <button type="submit" class="submit-btn" data-i18n="submit"></button>
       </div>
@@ -642,6 +737,44 @@
         ko: "기타 (프런트에 알려 주세요)",
       },
 
+      // Terms & Signature
+      termsTitle: {
+        en: "Terms & Conditions",
+        zh: "服務條款",
+        ja: "利用規約",
+        ko: "이용약관",
+      },
+      agreeTerms: {
+        en: "I have read and agree to the terms above.",
+        zh: "我已完整閱讀並同意上述契約內容",
+        ja: "上記の契約内容を確認し、同意します。",
+        ko: "위 계약 내용을 모두 읽고 동의합니다.",
+      },
+      agreeRequired: {
+        en: "Please agree to the terms before submitting.",
+        zh: "請先勾選同意條款後再送出。",
+        ja: "送信前に規約に同意してください。",
+        ko: "제출하기 전에 약관에 동의해 주세요.",
+      },
+      signatureLabel: {
+        en: "Please sign here:",
+        zh: "請在此簽名：",
+        ja: "ここに署名してください：",
+        ko: "여기에 서명해 주세요:",
+      },
+      signatureClear: {
+        en: "Clear & Re-sign",
+        zh: "清除重簽",
+        ja: "クリアして再署名",
+        ko: "지우고 다시 서명",
+      },
+      signatureRequired: {
+        en: "Please complete your signature before submitting.",
+        zh: "請完成簽名後再送出。",
+        ja: "送信前に署名を完了してください。",
+        ko: "제출하기 전에 서명을 완료해 주세요.",
+      },
+
       // Actions / alerts
       submit: { en: "Submit", zh: "送出", ja: "送信", ko: "제출" },
       submitOk: {
@@ -662,6 +795,55 @@
         ja: "必須項目をすべて入力してください。",
         ko: "모든 필수 항목을 입력해 주세요.",
       },
+    };
+
+    // Terms content per language (edit freely).
+    // Each item: { title, body }. Use \n inside body for paragraph breaks.
+    const TERMS = {
+      en: [
+        { title: "Article 1 | Basic Rules", body: "109 Hotel provides accommodation and related facilities. Guests are expected to use them properly and keep them in good condition.\nTo maintain safety and quality, guests must follow the hotel's rules." },
+        { title: "Article 2 | No Smoking", body: "Smoking is strictly prohibited throughout the property (including guest rooms, bathrooms, and public areas).\nSmoke detectors are installed in the rooms; please do not smoke or produce smoke.\nViolators will be charged NT$10,000 for cleaning and damages." },
+        { title: "Article 3 | Check-out", body: "Check-out time is before 11:00.\nPlease drop the room key into the \"Express Check-out Box\" at the front desk; no front-desk procedure is required." },
+        { title: "Article 4 | Late Check-out", body: "Late check-out must be requested in advance (via LINE or the front desk).\nThe fee is NT$200 per hour; additional charges apply for unauthorized late check-out." },
+        { title: "Article 5 | Rental Items", body: "Towel NT$20 / Toothbrush NT$10 / Bath towel NT$50\n*Damage or loss will be charged at the original price." },
+        { title: "Article 6 | Wi-Fi", body: "Password: 109109109\n*Please use in compliance with applicable laws." },
+        { title: "Article 7 | Equipment & Responsibility", body: "Please use all equipment with care. Guests are liable for any damage or loss." },
+        { title: "Article 8 | Safety Notice", body: "Surveillance cameras are installed in public areas.\nPlease keep your valuables with you; the hotel is not liable for their safekeeping." },
+        { title: "Article 9 | Other", body: "If a guest violates these rules or affects hotel operations, the hotel reserves the right to terminate the stay without refund." },
+      ],
+      zh: [
+        { title: "第一條｜基本規範", body: "本旅店提供住宿及相關設施，旅客應依規定使用並妥善保管。\n為維護安全與品質，旅客須遵守本旅店規範。" },
+        { title: "第二條｜禁菸規定", body: "全館（含客房、浴室及公共空間）全面禁止吸菸。\n房內設有煙霧偵測器，請勿吸菸或產生煙霧。\n違者將收取清潔及損害費 NT$10,000。" },
+        { title: "第三條｜退房規定", body: "退房時間為 11:00 前。\n鑰匙請投入櫃檯「快速退房盒」，無需櫃檯辦理。" },
+        { title: "第四條｜延遲退房", body: "延遲退房需事先申請（LINE 或櫃檯）。\n每小時 NT$200，未經同意逾時將加收費用。" },
+        { title: "第五條｜租借用品", body: "毛巾 NT$20 / 牙刷 NT$10 / 浴巾 NT$50\n※損壞或遺失需照價賠償" },
+        { title: "第六條｜Wi-Fi", body: "密碼：109109109\n※請遵守法律規範使用" },
+        { title: "第七條｜設備與責任", body: "設備請妥善使用，若有損壞或遺失需負賠償責任。" },
+        { title: "第八條｜安全提醒", body: "公共區域設有監視器。\n貴重物品請自行保管，本旅店不負保管責任。" },
+        { title: "第九條｜其他", body: "違反規定或影響營運者，本旅店得終止住宿且不退費。" },
+      ],
+      ja: [
+        { title: "第1条｜基本規範", body: "当ホテルは宿泊および関連設備を提供します。お客様は規定に従いご利用いただき、丁寧にお取り扱いください。\n安全と品質維持のため、当ホテルの規範を遵守してください。" },
+        { title: "第2条｜禁煙について", body: "館内全体（客室・バスルーム・共用スペースを含む）は全面禁煙です。\n客室には煙感知器を設置しております。喫煙や煙の発生はおやめください。\n違反された場合、清掃および損害費用として NT$10,000 を申し受けます。" },
+        { title: "第3条｜チェックアウト", body: "チェックアウトは 11:00 までとなります。\n鍵はフロントの「クイックチェックアウトボックス」にお入れください。フロントでの手続きは不要です。" },
+        { title: "第4条｜レイトチェックアウト", body: "レイトチェックアウトは事前申請が必要です（LINE またはフロント）。\n1 時間あたり NT$200、無断超過の場合は追加料金を申し受けます。" },
+        { title: "第5条｜レンタル用品", body: "タオル NT$20 / 歯ブラシ NT$10 / バスタオル NT$50\n※破損または紛失の場合は実費にてご請求いたします。" },
+        { title: "第6条｜Wi-Fi", body: "パスワード：109109109\n※法令を遵守してご利用ください。" },
+        { title: "第7条｜設備と責任", body: "設備は丁寧にご使用ください。破損または紛失の場合は賠償責任を負っていただきます。" },
+        { title: "第8条｜安全に関するお知らせ", body: "共用エリアには監視カメラを設置しております。\n貴重品はご自身で管理してください。当ホテルでは保管の責任を負いかねます。" },
+        { title: "第9条｜その他", body: "規定に違反した場合、または営業に支障をきたした場合、当ホテルは宿泊を終了する権利を有し、返金は行いません。" },
+      ],
+      ko: [
+        { title: "제1조 | 기본 규정", body: "본 호텔은 숙박 및 관련 시설을 제공합니다. 고객님은 규정에 따라 이용하시고 잘 관리해 주시기 바랍니다.\n안전과 품질 유지를 위해 본 호텔의 규정을 준수해 주십시오." },
+        { title: "제2조 | 금연 규정", body: "전관(객실·욕실·공용 공간 포함)은 전면 금연입니다.\n객실에는 연기 감지기가 설치되어 있으니 흡연이나 연기를 발생시키지 마십시오.\n위반 시 청소 및 손해 비용 NT$10,000이 청구됩니다." },
+        { title: "제3조 | 체크아웃", body: "체크아웃 시간은 11:00 이전입니다.\n열쇠는 프런트의 「퀵 체크아웃 박스」에 넣어 주시면 별도의 프런트 수속이 필요하지 않습니다." },
+        { title: "제4조 | 레이트 체크아웃", body: "레이트 체크아웃은 사전 신청이 필요합니다(LINE 또는 프런트).\n시간당 NT$200이며, 무단 초과 시 추가 요금이 부과됩니다." },
+        { title: "제5조 | 대여 용품", body: "수건 NT$20 / 칫솔 NT$10 / 목욕 수건 NT$50\n※파손 또는 분실 시 정가로 배상해야 합니다." },
+        { title: "제6조 | Wi-Fi", body: "비밀번호: 109109109\n※법령을 준수하여 사용해 주십시오." },
+        { title: "제7조 | 시설과 책임", body: "시설은 소중히 사용해 주십시오. 파손 또는 분실 시 배상 책임을 지셔야 합니다." },
+        { title: "제8조 | 안전 안내", body: "공용 구역에는 감시 카메라가 설치되어 있습니다.\n귀중품은 본인이 직접 보관해 주시기 바라며, 본 호텔은 보관 책임을 지지 않습니다." },
+        { title: "제9조 | 기타", body: "규정을 위반하거나 영업에 지장을 주는 경우, 본 호텔은 숙박을 종료할 수 있으며 환불은 이루어지지 않습니다." },
+      ],
     };
 
     function t(key, lang) {
@@ -728,6 +910,23 @@
       if (prev) fpInstance.setDate(prev, false);
     }
 
+    function renderTerms(lang) {
+      const box = document.getElementById("termsBox");
+      if (!box) return;
+      const list = TERMS[lang] || TERMS[DEFAULT_LANG] || [];
+      box.innerHTML = "";
+      list.forEach((item) => {
+        const h = document.createElement("h4");
+        h.textContent = item.title;
+        box.appendChild(h);
+        item.body.split("\n").forEach((line) => {
+          const p = document.createElement("p");
+          p.textContent = line;
+          box.appendChild(p);
+        });
+      });
+    }
+
     function applyLang(lang) {
       const dict = dictFor(lang);
       const htmlLang = lang === "zh" ? "zh-TW" : lang;
@@ -742,6 +941,7 @@
         if (dict[key] !== undefined) el.setAttribute("placeholder", dict[key]);
       });
 
+      renderTerms(lang);
       setupDatePicker(lang);
       applyFieldRules(lang);
 
@@ -934,6 +1134,82 @@
       });
     }
 
+    const sigCanvas = document.getElementById("signatureCanvas");
+    const sigClearBtn = document.getElementById("signatureClear");
+    const sigCtx = sigCanvas.getContext("2d");
+    let sigDrawing = false;
+    let sigHasInk = false;
+    let sigLastX = 0;
+    let sigLastY = 0;
+
+    function resizeSignatureCanvas() {
+      const rect = sigCanvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const prev = sigHasInk ? sigCanvas.toDataURL() : null;
+      sigCanvas.width = Math.max(1, Math.round(rect.width * dpr));
+      sigCanvas.height = Math.max(1, Math.round(rect.height * dpr));
+      sigCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sigCtx.lineWidth = 2;
+      sigCtx.lineCap = "round";
+      sigCtx.lineJoin = "round";
+      sigCtx.strokeStyle = "#202124";
+      if (prev) {
+        const img = new Image();
+        img.onload = () => sigCtx.drawImage(img, 0, 0, rect.width, rect.height);
+        img.src = prev;
+      }
+    }
+
+    function sigPoint(e) {
+      const rect = sigCanvas.getBoundingClientRect();
+      const t = e.touches && e.touches[0];
+      const cx = t ? t.clientX : e.clientX;
+      const cy = t ? t.clientY : e.clientY;
+      return { x: cx - rect.left, y: cy - rect.top };
+    }
+
+    function sigStart(e) {
+      e.preventDefault();
+      sigDrawing = true;
+      const p = sigPoint(e);
+      sigLastX = p.x;
+      sigLastY = p.y;
+    }
+    function sigMove(e) {
+      if (!sigDrawing) return;
+      e.preventDefault();
+      const p = sigPoint(e);
+      sigCtx.beginPath();
+      sigCtx.moveTo(sigLastX, sigLastY);
+      sigCtx.lineTo(p.x, p.y);
+      sigCtx.stroke();
+      sigLastX = p.x;
+      sigLastY = p.y;
+      sigHasInk = true;
+    }
+    function sigEnd(e) {
+      if (!sigDrawing) return;
+      if (e) e.preventDefault();
+      sigDrawing = false;
+    }
+
+    sigCanvas.addEventListener("mousedown", sigStart);
+    sigCanvas.addEventListener("mousemove", sigMove);
+    window.addEventListener("mouseup", sigEnd);
+    sigCanvas.addEventListener("touchstart", sigStart, { passive: false });
+    sigCanvas.addEventListener("touchmove", sigMove, { passive: false });
+    sigCanvas.addEventListener("touchend", sigEnd);
+    sigCanvas.addEventListener("touchcancel", sigEnd);
+
+    function clearSignature() {
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+      sigHasInk = false;
+    }
+    sigClearBtn.addEventListener("click", clearSignature);
+
+    window.addEventListener("resize", resizeSignatureCanvas);
+    resizeSignatureCanvas();
+
     async function sendToBackend(payload, file) {
       if (!ENDPOINT) {
         console.warn("ENDPOINT 未設定，以下是送出資料：", payload, file);
@@ -974,6 +1250,11 @@
         return;
       }
 
+      if (!sigHasInk) {
+        alert(dict.signatureRequired);
+        return;
+      }
+
       const btn = form.querySelector(".submit-btn");
       const overlay = document.getElementById("submitOverlay");
       btn.disabled = true;
@@ -986,6 +1267,7 @@
         const key = data.nationality === "OTHER" ? "nationalityOther" : "nat" + data.nationality;
         data.nationality = t(key, lang) || data.nationality;
       }
+      data.signatureBase64 = sigCanvas.toDataURL("image/png");
       const rawFile = idFileInput.files && idFileInput.files[0];
       let file = compressedFile || rawFile;
 
@@ -1001,6 +1283,7 @@
         form.reset();
         compressedFile = null;
         updateFileName();
+        clearSignature();
         alert(dict.submitOk);
       } catch (err) {
         console.error(err);
